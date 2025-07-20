@@ -1,13 +1,30 @@
-using System.IO;
-
 class Journal
 {
-  public List<Entry> _entries = [];
+  public List<Entry> _entries = new();
 
   public void AddEntry(Entry newEntry)
   {
     _entries.Add(newEntry);
   }
+
+  public void CreateEntry()
+  {
+    PromptGenerator promptGenerator = new();
+    string prompt = promptGenerator.GetRandomPrompt();
+    Console.WriteLine(prompt);
+    Console.Write("> ");
+    string entry = Console.ReadLine();
+
+    Entry newEntry = new()
+    {
+      _date = DateTime.Now.ToShortDateString(),
+      _promptText = prompt,
+      _entryText = entry
+    };
+
+    AddEntry(newEntry);
+  }
+
   public void DisplayAll()
   {
     for (int i = 0; i < _entries.Count; i++)
@@ -16,6 +33,20 @@ class Journal
       _entries[i].Display();
       Console.WriteLine("");
     }
+  }
+
+  public void Save()
+  {
+    Console.WriteLine("Save as?");
+    string saveFile = Console.ReadLine();
+    SaveToFile(saveFile);
+  }
+
+  public void Load()
+  {
+    Console.WriteLine("Load from?");
+    string loadFile = Console.ReadLine();
+    LoadFromFile(loadFile);
   }
 
   public void SaveToFile(string fileName)
@@ -27,7 +58,6 @@ class Journal
         writer.WriteLine($"{entry._date}|{entry._promptText}|{entry._entryText}");
       }
     }
-
     Console.WriteLine("Journal saved to file successfully");
   }
 
@@ -55,6 +85,27 @@ class Journal
     else
     {
       Console.WriteLine("File not found.");
+    }
+  }
+
+  public void Delete()
+  {
+    if (_entries.Count > 0)
+    {
+      DisplayAll();
+      Console.Write("Enter the number of the entry to delete: ");
+      if (int.TryParse(Console.ReadLine(), out int entryNumber))
+      {
+        DeleteEntry(entryNumber - 1);
+      }
+      else
+      {
+        Console.WriteLine("Invalid input. Please enter a number.");
+      }
+    }
+    else
+    {
+      Console.WriteLine("No entries to delete.");
     }
   }
 

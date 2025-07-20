@@ -2,97 +2,79 @@
 
 using System;
 
+enum MenuAction
+{
+    Write = 1,
+    Display,
+    Load,
+    Save,
+    Delete,
+    Quit
+}
+
 class Program
 {
     static void Main(string[] args)
     {
-        List<string> choices = ["Write", "Display", "Load", "Save", "Delete", "Quit"];
-        string choice = "";
+        Dictionary<int, string> choices = new()
+        {
+            { (int)MenuAction.Write, "Write" },
+            { (int)MenuAction.Display, "Display" },
+            { (int)MenuAction.Load, "Load" },
+            { (int)MenuAction.Save, "Save" },
+            { (int)MenuAction.Delete, "Delete" },
+            { (int)MenuAction.Quit, "Quit" }
+        };
+
+        int choice = 0;
         Journal journal = new();
 
-        while (choice != "6")
+        while (choice != (int)MenuAction.Quit)
         {
             Console.WriteLine("\nPlease select one of the following choices:");
-
-            for (int i = 0; i < choices.Count; i++)
+            foreach (var pair in choices)
             {
-                Console.WriteLine($"{i + 1}. {choices[i]}");
+                Console.WriteLine($"{pair.Key}. {pair.Value}");
             }
 
             Console.WriteLine("");
             Console.Write("What would you like to do? ");
-            choice = Console.ReadLine();
+            int.TryParse(Console.ReadLine(), out choice);
             Console.WriteLine("");
 
-            switch (choice)
+            switch ((MenuAction)choice)
             {
-                case "1":
-                    PromptGenerator promptGenerator = new();
-                    string prompt = promptGenerator.GetRandomPrompt();
-                    Console.WriteLine(prompt);
-                    Console.Write("> ");
-                    string entry = Console.ReadLine();
-
-                    Entry newEntry = new()
-                    {
-                        _date = DateTime.Now.ToShortDateString(),
-                        _promptText = prompt,
-                        _entryText = entry
-                    };
-
-                    journal.AddEntry(newEntry);
+                case MenuAction.Write:
+                    journal.CreateEntry();
                     break;
 
-                case "2":
+                case MenuAction.Display:
                     if (journal._entries.Count > 0)
-                    {
                         journal.DisplayAll();
-                    }
                     else
-                    {
                         Console.WriteLine("No entries to display.");
-                    }
                     break;
 
-                case "3":
-                    Console.WriteLine("Load from?");
-                    string loadFile = Console.ReadLine();
-                    journal.LoadFromFile(loadFile);
+                case MenuAction.Load:
+                    journal.Load();
                     break;
 
-                case "4":
-                    Console.WriteLine("Save as?");
-                    string saveFile = Console.ReadLine();
-                    journal.SaveToFile(saveFile);
+                case MenuAction.Save:
+                    journal.Save();
                     break;
 
-                case "5":
-                    if (journal._entries.Count > 0)
-                    {
-                        journal.DisplayAll();
-                        Console.Write("Enter the number of the entry to delete: ");
-                        if (int.TryParse(Console.ReadLine(), out int entryNumber))
-                        {
-                            journal.DeleteEntry(entryNumber - 1);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid input. Please enter a number.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No entries to delete.");
-                    }
+                case MenuAction.Delete:
+                    journal.Delete();
+                    break;
+
+                case MenuAction.Quit:
+                    Console.WriteLine("Goodbye!\n");
                     break;
 
                 default:
-                    Console.WriteLine("Goodbye!\n");
-                    choice = "6";
+                    Console.WriteLine("Invalid choice. Please try again.");
                     break;
-
             }
-
         }
     }
 }
