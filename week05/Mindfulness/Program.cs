@@ -28,7 +28,7 @@ class Program
             {
                 Console.WriteLine($"{pair.Key}. {pair.Value}");
             }
-            
+
             Console.Write("Select a choice from the menu: ");
             int.TryParse(Console.ReadLine(), out choice);
 
@@ -38,6 +38,13 @@ class Program
                     BreathingActivity breathingActivity = new("Breathing Activity", "This activity will help you relax by walking you through breathing in and out slowly. Clear your mind and focus on your breathing.");
                     breathingActivity.DisplayStartingMessage();
                     breathingActivity.Run();
+                    break;
+
+                case MenuAction.ListingActivity:
+                    ListingActivity listingActivity = new("Listing Activity", "This activity will help you reflect on the good things in your life by having you list as many things as you can in a certain area.");
+
+                    listingActivity.DisplayStartingMessage();
+                    listingActivity.Run();
                     break;
             }
 
