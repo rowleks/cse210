@@ -1,3 +1,6 @@
+// I added a feature where no prompts or questions are repeated until all have been used at least once in a session.
+
+
 class ReflectingActivity : Activity
 {
 
@@ -28,14 +31,14 @@ class ReflectingActivity : Activity
 
   public string GetRandomPrompt()
   {
-    Random random = new Random();
+    Random random = new();
     int index = random.Next(0, _prompts.Count);
     return _prompts[index];
   }
 
   public string GetRandomQuestion()
   {
-    Random random = new Random();
+    Random random = new();
     int index = random.Next(0, _questions.Count);
     return _questions[index];
   }
@@ -53,30 +56,72 @@ class ReflectingActivity : Activity
     Console.Write($"> {question} ");
   }
 
+  // Fisher-Yates shuffle helper method
+  private void ShuffleList<T>(List<T> list, Random rand)
+  {
+    int n = list.Count;
+    for (int i = n - 1; i > 0; i--)
+    {
+      int j = rand.Next(i + 1);
+      T temp = list[i];
+      list[i] = list[j];
+      list[j] = temp;
+    }
+  }
+
   public void Run()
   {
     Console.Clear();
     Console.WriteLine("Get ready...");
     ShowSpinner(5);
 
-    DisplayPrompt();
-    Console.Write("When you're ready, press enter to continue... ");
-    Console.ReadLine();
-    Console.WriteLine("");
+    // Shuffle prompts to avoid repeats
+    List<string> shuffledPrompts = new List<string>(_prompts);
+    Random rand = new();
+    ShuffleList(shuffledPrompts, rand);
 
-    Console.WriteLine("Now ponder on each of the following questions as they related to this experience:");
-    Console.Write("You may begin in: ");
-    ShowCountDown(5);
-    Console.Clear();
+    // Shuffle questions to avoid repeats
+    List<string> shuffledQuestions = new List<string>(_questions);
+    ShuffleList(shuffledQuestions, rand);
 
     DateTime start = DateTime.Now;
     DateTime end = start.AddSeconds(GetDuration());
+    int promptIndex = 0;
+    int questionIndex = 0;
 
     while (DateTime.Now < end)
     {
-      DisplayQuestion();
-      ShowSpinner(5);
+      // Show prompt (cycle through all prompts before repeating)
+      if (promptIndex >= shuffledPrompts.Count)
+      {
+        promptIndex = 0;
+        ShuffleList(shuffledPrompts, rand);
+      }
+      string prompt = shuffledPrompts[promptIndex];
+      Console.WriteLine("\nReflect on the following prompt:");
+      Console.WriteLine($"--- {prompt} ---");
+      promptIndex++;
+
+      Console.Write("When you're ready, press enter to continue... ");
+      Console.ReadLine();
       Console.WriteLine("");
+
+      Console.WriteLine("Now ponder on each of the following questions as they relate to this experience:");
+      Console.Write("You may begin in: ");
+      ShowCountDown(5);
+      Console.Clear();
+
+      // Show all questions for this prompt (cycle through all questions before repeating)
+      questionIndex = 0;
+      ShuffleList(shuffledQuestions, rand);
+      foreach (var question in shuffledQuestions)
+      {
+        Console.Write($"> {question} ");
+        ShowSpinner(5);
+        Console.WriteLine("");
+        questionIndex++;
+        if (DateTime.Now >= end) break;
+      }
     }
 
     DisplayEndingMessage();

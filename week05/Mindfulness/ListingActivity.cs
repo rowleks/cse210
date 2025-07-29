@@ -1,3 +1,4 @@
+// I added a feature where no prompts or questions are repeated until all have been used at least once in a session.
 class ListingActivity : Activity
 {
 
@@ -11,16 +12,28 @@ class ListingActivity : Activity
       "What are personal strengths of yours?",
       "Who are people that you have helped this week?",
       "When have you felt the Holy Ghost this month?",
-      "Who are some of your personal heroes?"];
+      "Who are some of your personal heroes?"
+    ];
     _count = 0;
   }
 
-  public void GetRandomPrompt()
+  // Fisher-Yates shuffle helper method
+  private void ShuffleList<T>(List<T> list, Random rand)
   {
-    Random random = new Random();
-    int index = random.Next(0, _prompts.Count);
+    int n = list.Count;
+    for (int i = n - 1; i > 0; i--)
+    {
+      int j = rand.Next(i + 1);
+      T temp = list[i];
+      list[i] = list[j];
+      list[j] = temp;
+    }
+  }
+
+  public void DisplayPrompt(string prompt)
+  {
     Console.WriteLine("\nList as many responses you can to the following prompt:");
-    Console.WriteLine($"--- {_prompts[index]} ---");
+    Console.WriteLine($"--- {prompt} ---");
   }
 
   public List<string> GetListFromUser()
@@ -31,7 +44,6 @@ class ListingActivity : Activity
 
     userInput.Add(input);
     return userInput;
-
   }
 
   public void Run()
@@ -40,7 +52,14 @@ class ListingActivity : Activity
     Console.WriteLine("Get ready...");
     ShowSpinner(5);
 
-    GetRandomPrompt();
+    // Shuffle prompts to avoid repeats
+    List<string> shuffledPrompts = [.. _prompts];
+    Random rand = new();
+    ShuffleList(shuffledPrompts, rand);
+
+    // Display the first prompt from the shuffled list
+    string prompt = shuffledPrompts[0];
+    DisplayPrompt(prompt);
 
     Console.Write("You may begin in: ");
     ShowCountDown(5);
