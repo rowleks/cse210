@@ -36,8 +36,16 @@ class Program
             {
                 case MenuAction.BreathingActivity:
                     BreathingActivity breathingActivity = new("Breathing Activity", "This activity will help you relax by walking you through breathing in and out slowly. Clear your mind and focus on your breathing.");
+
                     breathingActivity.DisplayStartingMessage();
                     breathingActivity.Run();
+                    break;
+
+                case MenuAction.ReflectingActivity:
+                    ReflectingActivity reflectingActivity = new("Reflecting Activity", "This activity will help you reflect on times in your life when you have shown strength and resilience. This will help you recognize the power you have and how you can use it in other aspects of you life.");
+
+                    reflectingActivity.DisplayStartingMessage();
+                    reflectingActivity.Run();
                     break;
 
                 case MenuAction.ListingActivity:
@@ -45,6 +53,14 @@ class Program
 
                     listingActivity.DisplayStartingMessage();
                     listingActivity.Run();
+                    break;
+
+                case MenuAction.Quit:
+                    Console.WriteLine("Goodbye\n");
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
                     break;
             }
 

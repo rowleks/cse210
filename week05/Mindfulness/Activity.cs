@@ -9,9 +9,10 @@ class Activity
     _name = name;
     _description = description;
   }
- 
+
   public void DisplayStartingMessage()
   {
+    Console.Clear();
     Console.WriteLine($"\nWelcome to the {_name}.\n");
     Console.WriteLine($"{_description}\n");
     Console.Write("How long, in seconds, would you like for your session? ");

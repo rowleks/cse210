@@ -6,9 +6,12 @@ class ListingActivity : Activity
 
   public ListingActivity(string name, string description) : base(name, description)
   {
-    _prompts = ["Who are people that you appreciate?",
+    _prompts = [
+      "Who are people that you appreciate?",
       "What are personal strengths of yours?",
-      "Who are people that you have helped this week?", "When have you felt the Holy Ghost this month?", "Who are some of your personal heroes?"];
+      "Who are people that you have helped this week?",
+      "When have you felt the Holy Ghost this month?",
+      "Who are some of your personal heroes?"];
     _count = 0;
   }
 
@@ -16,7 +19,7 @@ class ListingActivity : Activity
   {
     Random random = new Random();
     int index = random.Next(0, _prompts.Count);
-    Console.WriteLine("List as many responses you can to the following prompt:");
+    Console.WriteLine("\nList as many responses you can to the following prompt:");
     Console.WriteLine($"--- {_prompts[index]} ---");
   }
 
