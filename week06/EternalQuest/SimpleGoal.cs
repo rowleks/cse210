@@ -2,10 +2,10 @@ public class SimpleGoal : Goal
 {
   private bool _isComplete;
 
-  public SimpleGoal(string shortName, string description, int points)
+  public SimpleGoal(string shortName, string description, int points, bool isComplete = false)
       : base(shortName, description, points)
   {
-    _isComplete = false;
+    _isComplete = isComplete;
   }
 
   public override int RecordEvent()
