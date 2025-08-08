@@ -17,6 +17,7 @@ public class GoalManager
     ListGoals,
     SaveGoals,
     LoadGoals,
+    RemoveGoal,
     RecordEvent,
     Quit
   }
@@ -31,6 +32,7 @@ public class GoalManager
             { (int)MenuOptions.ListGoals, "List Goals" },
             { (int)MenuOptions.SaveGoals, "Save Goals" },
             { (int)MenuOptions.LoadGoals, "Load Goals" },
+            { (int)MenuOptions.RemoveGoal, "Remove Goal" },
             { (int)MenuOptions.RecordEvent, "Record Event" },
             { (int)MenuOptions.Quit, "Quit" }
         };
@@ -66,16 +68,21 @@ public class GoalManager
           Console.WriteLine("");
 
           SaveGoals();
-          Thread.Sleep(2000);
-          Console.Clear();
+          ClearConsole(3);
           break;
 
         case MenuOptions.LoadGoals:
           Console.WriteLine("");
 
           LoadGoals();
-          Thread.Sleep(2000);
-          Console.Clear();
+          ClearConsole(3);
+          break;
+
+        case MenuOptions.RemoveGoal:
+          Console.WriteLine("");
+
+          RemoveGoal();
+          ClearConsole(3);
           break;
 
         case MenuOptions.RecordEvent:
@@ -117,8 +124,7 @@ public class GoalManager
 
     Console.WriteLine($"\nCongratulations! You have earned {pointsEarned} points for completing the goal!");
     Console.WriteLine($"Your total score is now {_score} points.");
-    Thread.Sleep(5000);
-    Console.Clear();
+    ClearConsole(3);
   }
 
   public void CreateGoal()
@@ -182,8 +188,7 @@ public class GoalManager
 
     AddGoal(newGoal);
     Console.WriteLine($"Goal: '{shortName}' created successfully!");
-    Thread.Sleep(3000);
-    Console.Clear();
+    ClearConsole(3);
   }
 
   public void SaveGoals()
@@ -206,6 +211,8 @@ public class GoalManager
           writer.WriteLine(goal.GetStringRep());
         }
       }
+      Console.WriteLine("Saving goals...");
+      ShowSpinner(5);
       Console.WriteLine($"Goals saved to {fileName} successfully!");
     }
     catch (Exception ex)
@@ -237,13 +244,15 @@ public class GoalManager
             _score = loadedScore;
             continue;
           }
-          Goal goal = CreateGoalFromString(line);
+          Goal goal = CreateGoalFromFile(line);
           if (goal != null)
           {
             AddGoal(goal);
           }
         }
       }
+      Console.WriteLine("Loading goal...");
+      ShowSpinner(5);
       Console.WriteLine($"Goals loaded from {fileName} successfully!");
     }
     catch (Exception e)
@@ -252,9 +261,31 @@ public class GoalManager
     }
   }
 
+  public void RemoveGoal()
+  {
+    ListGoalNames();
+
+    if (_goals.Count == 0)
+    {
+      return;
+    }
+    Console.Write("Which goal would you like to remove? ");
+
+    int choice;
+
+    while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > _goals.Count)
+    {
+      Console.WriteLine("Invalid choice. Please try again.");
+      Console.Write("Which goal would you like to remove? ");
+    }
+
+    Goal selectedGoal = _goals[choice - 1];
+    RemoveGoal(selectedGoal);
+    Console.WriteLine($"Goal '{selectedGoal.GetShortName()}' removed successfully!");
+  }
+
+
   // ------------- Display functions-------------------
-
-
 
   public void DisplayPlayerInfo()
   {
@@ -273,8 +304,8 @@ public class GoalManager
     {
       Console.WriteLine($"{i + 1}. {_goals[i].GetShortName()}");
     }
+    ;
   }
-
 
   public void ListGoalsDetails()
   {
@@ -294,6 +325,7 @@ public class GoalManager
   }
 
   // --------------- Helper functions -------------------
+
   private void AddGoal(Goal goal)
   {
     _goals.Add(goal);
@@ -302,6 +334,24 @@ public class GoalManager
   private void RemoveGoal(Goal goal)
   {
     _ = _goals.Remove(goal);
+  }
+
+  private void ClearConsole(int seconds)
+  {
+    int ms = seconds * 1000;
+    Thread.Sleep(ms);
+    Console.Clear();
+  }
+
+  private void ShowSpinner(int seconds)
+  {
+    List<string> spinner = ["-", "\\", "|", "/"];
+    for (int i = 0; i < seconds; i++)
+    {
+      Console.Write(spinner[i % 4]);
+      Thread.Sleep(1000);
+      Console.Write("\b \b");
+    }
   }
 
   private void ListGoals()
@@ -314,7 +364,7 @@ public class GoalManager
     }
   }
 
-  private Goal CreateGoalFromString(string line)
+  private Goal CreateGoalFromFile(string line)
   {
     string[] parts = line.Split('|');
     if (parts.Length == 0) return null;
